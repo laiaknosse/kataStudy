@@ -16,7 +16,8 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
     }
 
-    public void createUsersTable() throws SQLException {
+    @Override
+    public void createUsersTable() {
         try (Statement statement = connection.createStatement()) {
             String sql = "CREATE TABLE IF NOT EXISTS users (" +
                     "id BIGINT," +
@@ -27,15 +28,11 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             statement.execute(sql);
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
+    @Override
     public void dropUsersTable() {
-        connection = getConnection();
         String sql = "drop table if exists users";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
@@ -44,27 +41,24 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         }
     }
 
-    public void saveUser(String name, String lastName, byte age) throws SQLException {
-        connection = getConnection();
+    @Override
+    public void saveUser(String name, String lastName, byte age) {
         String sql = "insert into users (id, name, lastName, age) values (? ,?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, id++);
-            statement.setString(2, name);
-            statement.setString(3, lastName);
-            statement.setByte(4, age);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, id++);
+            preparedStatement.setString(2, name);
+            preparedStatement.setString(3, lastName);
+            preparedStatement.setByte(4, age);
 
-            statement.executeUpdate();
+            preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
-    public void removeUserById(long id) throws SQLException {
+    @Override
+    public void removeUserById(long id) {
         connection = getConnection();
 
         String sql = "delete from users where id = ?";
@@ -73,16 +67,18 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
+            try {
+                connection.rollback();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
             }
         }
+
     }
 
-    public List<User> getAllUsers() throws SQLException {
+    @Override
+    public List<User> getAllUsers() {
 
-        connection = getConnection();
         List<User> userList = new ArrayList<>();
 
         String sql = "select id, name, lastName, age from users";
@@ -100,26 +96,18 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
         return userList;
     }
 
-    public void cleanUsersTable() throws SQLException {
-        connection = getConnection();
+    @Override
+    public void cleanUsersTable() {
 
-        String sql = "delete from users";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
+
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("TRUNCATE TABLE users");
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
 
     }
