@@ -10,7 +10,6 @@ import java.util.List;
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
     Connection connection = getConnection();
-    long id = 1L;
 
     public UserDaoJDBCImpl() {
 
@@ -20,7 +19,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     public void createUsersTable() {
         try (Statement statement = connection.createStatement()) {
             String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                    "id BIGINT," +
+                    "id INT PRIMARY KEY AUTO_INCREMENT," +
                     "name VARCHAR(255)," +
                     "lastName VARCHAR(255)," +
                     "age TINYINT" +
@@ -43,12 +42,11 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "insert into users (id, name, lastName, age) values (? ,?, ?, ?)";
+        String sql = "insert into users (name, lastName, age) values (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id++);
-            preparedStatement.setString(2, name);
-            preparedStatement.setString(3, lastName);
-            preparedStatement.setByte(4, age);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setByte(3, age);
 
             preparedStatement.executeUpdate();
 
