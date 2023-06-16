@@ -9,7 +9,7 @@ import java.util.List;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
-    Connection connection = getConnection();
+    Connection connection = null;
 
     public UserDaoJDBCImpl() {
 
@@ -57,7 +57,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
     @Override
     public void removeUserById(long id) {
-        connection = getConnection();
+        connection = null;
 
         String sql = "delete from users where id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

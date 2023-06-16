@@ -1,28 +1,33 @@
 package jm.task.core.jdbc.util;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import jm.task.core.jdbc.model.User;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.Configuration;
+
+import java.util.Properties;
+
+import static org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO;
+
 
 public class Util {
-    // реализуйте настройку соеденения с БД
-    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/mydatabase";
-    private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "admin";
-
-    public static Connection getConnection() {
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-            Class.forName(DB_DRIVER);
-            System.out.println("OK");
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-            System.out.println("ERROR");
-        }
-        return connection;
 
 
+    public static SessionFactory getSessionFactory() {
+        Configuration configuration = new Configuration();
+        Properties properties = new Properties();
+        properties.put(AvailableSettings.DRIVER, "com.mysql.cj.jdbc.Driver");
+        properties.put(AvailableSettings.URL, "jdbc:mysql://localhost:3306/users");
+        properties.put(AvailableSettings.USER, "root");
+        properties.put(AvailableSettings.PASS, "admin");
+        properties.put(AvailableSettings.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+        properties.put(AvailableSettings.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
+        //properties.put(HBM2DDL_AUTO, "update");
+
+        return configuration
+                .setProperties(properties)
+                .addAnnotatedClass(User.class)
+                .buildSessionFactory();
     }
 }
