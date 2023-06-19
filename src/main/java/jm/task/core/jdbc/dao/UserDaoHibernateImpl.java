@@ -29,6 +29,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             System.out.println("Таблица users создана");
         } catch (Exception e) {
+            sessionFactory.getCurrentSession().beginTransaction().rollback();
             System.out.println("Таблица не может быть создана");
 
         }
